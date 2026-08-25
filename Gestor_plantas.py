@@ -8,7 +8,7 @@ FICHEIRO = "plantas.json"
 
 #Funciones: 
 
-#1. menu
+#1. menu:
 def menu():
         print("\n--- Gestor de Plantas ---")
         print("1. Adicionar planta")
@@ -18,7 +18,16 @@ def menu():
         print("5. Remover planta")
         print("0. Sair")
 
-
+# =====================================================================
+#2. Carregar os dados:
+def carregar_dados():
+    try:
+        with open(FICHEIRO,  "r", encoding="utf-8") as ficheiro:
+            dados = json.load(ficheiro)
+            return dados
+    except  FileNotFoundError:
+        print("O ficheiro plantas.json ainda não existe.")
+        return[]
 # =====================================================================
 
 #Programa Principal:
