@@ -22,10 +22,10 @@ def carregar_dados():
                 print("Erro: o ficheiro JSON está inválido.") # Possivel erro : Ficheiro JSON invalido
                 return {"utilizadores": [], "plantas": []}
 
-            if "utilizadores" not in dados:
+            if not isinstance(dados.get("utilizadores"), list):
                 dados["utilizadores"] = []
 
-            if "plantas" not in dados:
+            if not isinstance(dados.get("plantas"), list):
                 dados["plantas"] = []
 
             return dados
@@ -75,7 +75,7 @@ def criar_conta(dados):
 
     # NOME
     while True:
-        nome = input("Nome: ").strip().upper()
+        nome = input("Nome: ").strip()
         if nome == "":
             print("Erro: o nome não pode estar vazio.") # Possivel erro: nome estar vazio
             continue
@@ -136,16 +136,10 @@ def criar_conta(dados):
 
     # GERAR ID
 # GERAR ID
-    if len(dados["utilizadores"]) == 0:
+    if not dados["utilizadores"]:
         novo_id = 1
     else:
-        maior_id = 0
-
-        for utilizador in dados["utilizadores"]:
-            if utilizador["id"] > maior_id:
-                maior_id = utilizador["id"]
-
-        novo_id = maior_id + 1
+        novo_id = max([planta["id"] for planta in dados["plantas"]],default=0) + 1
 
     # CRIAR UTILIZADOR
     utilizador = {
@@ -199,7 +193,6 @@ def entrar_conta(dados):
                     continue
 
                 if password == utilizador["password"]:
-                    print(f"\nBem-vinda, {utilizador['nome']}!")
                     return utilizador
 
                 print("Erro: password incorreta.") # Possivel erro: password incorreto
@@ -257,7 +250,7 @@ def menu_da_conta(dados, utilizador):
         print("1. Adicionar planta") #✔️
         print("2. Listar plantas") #✔️
         print("3. Atualizar planta")
-        print("4. Remover planta")
+        print("4. Remover planta") #✔️
         print("5. Rega Urgente!")        
         print("6. Editar o meu Perfil")
         print("0. Voltar Atrás") #✔️
@@ -276,7 +269,8 @@ def menu_da_conta(dados, utilizador):
             listar_plantas(dados, utilizador)
 
         elif opcao == "3":
-            print("-")
+            atualizar_planta(dados, utilizador)
+
         elif opcao == "4":
             remover_planta(dados, utilizador)
 
@@ -397,7 +391,7 @@ def adicionar_planta(dados, utilizador):
     print(f"{nome} adicionada com sucesso!")
 
 # ========================================================================================================================
-#  5 - LISTAR PLANTAS
+#  6 - LISTAR PLANTAS
 # ========================================================================================================================
 
 def listar_plantas(dados, utilizador):
@@ -410,7 +404,7 @@ def listar_plantas(dados, utilizador):
         if planta["user_id"] == utilizador["id"]:
             minhas_plantas.append(planta)
 
-    if len(minhas_plantas) == 0: 
+    if not minhas_plantas: 
         print("Não tens nenhuma planta registada.")  # Possivel erro: sem plantas registadas
         return
 
@@ -432,7 +426,118 @@ def listar_plantas(dados, utilizador):
     print(f"Tens un total de {len(minhas_plantas)} plantas")
 
 # ========================================================================================================================
-#  7 - REMOVER PLANTA
+#  7 - ATUALIZAR PLANTA
+# ========================================================================================================================
+
+def atualizar_planta(dados, utilizador):
+
+    print("\n--- ATUALIZAR PLANTA ---")
+
+    tem_plantas = False     # Verificar se o utilizador tem plantas
+
+    for planta in dados["plantas"]:
+        if planta["user_id"] == utilizador["id"]:
+            tem_plantas = True
+            break
+
+    if not tem_plantas:
+        print("Não tens nenhuma planta registada.")
+        return
+
+    #Funciones complementares
+    montrar_plantas(dados,utilizador)
+    planta_encontrada = procurar_planta(dados, utilizador)
+
+    print("\nDeixa vazio se não quiseres alterar o valor.")
+
+    # NOME
+    while True:
+        novo_nome = input(f"Novo nome [{planta_encontrada['nome']}]: ").strip()
+
+        if novo_nome == "":
+            break
+
+        nome_repetido = False
+
+        for planta in dados["plantas"]:
+            if (
+                planta != planta_encontrada
+                and planta["user_id"] == utilizador["id"]
+                and planta["nome"].lower() == novo_nome.lower()
+            ):
+                nome_repetido = True
+                break
+
+        if nome_repetido:
+            print("Erro: já tens outra planta com esse nome.")
+            continue
+
+        planta_encontrada["nome"] = novo_nome
+        break
+
+    # TIPO
+    novo_tipo = input(
+        f"Novo tipo [{planta_encontrada['tipo']}]: "
+    ).strip()
+
+    if novo_tipo != "":
+        planta_encontrada["tipo"] = novo_tipo
+
+    # CUIDADOS
+    novos_cuidados = input(
+        f"Novos cuidados [{planta_encontrada['cuidados']}]: "
+    ).strip()
+
+    if novos_cuidados != "":
+        planta_encontrada["cuidados"] = novos_cuidados
+
+    # DATA DA ÚLTIMA REGA
+    while True:
+
+        nova_data = input( f"Nova data da última rega [{planta_encontrada['ultima_rega']}]: ").strip()
+
+        if nova_data == "":
+            break
+
+        try:
+
+            data_rega = datetime.strptime( nova_data,"%Y-%m-%d").date()
+
+            if data_rega > date.today():
+                print("Erro: a data não pode ser futura.")
+                continue
+
+            planta_encontrada["ultima_rega"] = nova_data
+            break
+
+        except ValueError:
+            print("Erro: data inválida, utiliza o formato AAAA-MM-DD.")
+
+    # FREQUÊNCIA DE REGA
+    while True:
+        nova_frequencia = input(f"Nova frequência de rega [{planta_encontrada['frequencia_rega']}]: ").strip()
+
+        if nova_frequencia == "":
+            break
+
+        try:
+            nova_frequencia = int(nova_frequencia)
+
+            if nova_frequencia <= 0:
+                print("Erro: a frequência deve ser superior a 0.")
+                continue
+
+            planta_encontrada["frequencia_rega"] = nova_frequencia
+            break
+
+        except ValueError:
+            print("Erro: a frequência deve ser um número inteiro.")
+
+    guardar_dados(dados)
+    print("\nPlanta atualizada com sucesso!")
+
+# =======================================================================================================================
+#  8 - REMOVER PLANTA
 # ========================================================================================================================
 
 def remover_planta(dados, utilizador):
@@ -451,39 +556,9 @@ def remover_planta(dados, utilizador):
         return
 
     # MOSTRAR AS PLANTAS DO UTILIZADOR     -----------------------------------------------------------------------------------------------> transformar en funcion ????
-    print("As tuas plantas:")
-    for planta in dados["plantas"]:
-        if planta["user_id"] == utilizador["id"]:
-            print(f"- {planta['nome']}")
+    montrar_plantas(dados,utilizador)
+    planta_encontrada = procurar_planta(dados, utilizador)
 
-    # PEDIR NOME
-    while True:
-
-        nome_planta =input("Nome da planta que queres remover: ").strip()
-
-        if nome_planta == "":
-            print("Erro: o nome da planta não pode estar vazio.")
-            continue
-
-        planta_encontrada = None
-
-        for planta in dados["plantas"]:
-            if (
-                planta["nome"].lower() == nome_planta.lower() and planta["user_id"] == utilizador["id"]):
-                planta_encontrada = planta
-                break
-
-        if planta_encontrada is None:
-            print(f"Erro: Não foi encontrado nenhuma planta chamada {nome_planta}")
-            continue
-
-        break
-
-    # MOSTRAR PLANTA
-    print("\nPlanta encontrada:")
-    print(f"Nome: {planta_encontrada['nome']}")
-    print(f"Tipo: {planta_encontrada['tipo']}")
-    print(f"Última rega: {planta_encontrada['ultima_rega']}")
 
     # CONFIRMAR ELIMINACAO
 
@@ -503,8 +578,53 @@ def remover_planta(dados, utilizador):
     # REMOVER
     dados["plantas"].remove(planta_encontrada)
     guardar_dados(dados)
-    print(f"\nA planta '{planta_encontrada['nome']} foi removida com sucesso!")
+    print(f"\nA planta '{planta_encontrada['nome']}' foi removida com sucesso!")
 
+# =======================================================================================================================
+#  1- fUNCION COMPLEMENTAR - Mostrar plantas
+# ========================================================================================================================
+
+def montrar_plantas(dados,utilizador):
+    print("As tuas plantas:")
+    for planta in dados["plantas"]:
+        if planta["user_id"] == utilizador["id"]:
+            print(f"- {planta['nome']}")
+
+# =======================================================================================================================
+#  2 fUNCION COMPLEMENTAR - Procurar Plantas
+# ========================================================================================================================
+
+def procurar_planta(dados, utilizador):
+
+    while True:
+        nome_planta = input("Nome da planta: ").strip()
+
+        if nome_planta == "":
+            print("Erro: o nome da planta não pode estar vazio.")
+            continue
+
+        planta_encontrada = None
+
+        for planta in dados["plantas"]:
+            if (
+                planta["nome"].lower() == nome_planta.lower()
+                and planta["user_id"] == utilizador["id"]
+            ):
+                planta_encontrada = planta
+                break
+
+        if planta_encontrada is None:
+            print(f"Erro: Não foi encontrada nenhuma planta chamada {nome_planta}.")
+            continue
+
+        print("\nPlanta encontrada:")
+        print(f"Nome: {planta_encontrada['nome']}")
+        print(f"Tipo: {planta_encontrada['tipo']}")
+        print(f"Cuidados: {planta_encontrada['cuidados']}")
+        print(f"Última rega: {planta_encontrada['ultima_rega']}")
+        print(f"Frequência de rega: {planta_encontrada['frequencia_rega']} dias")
+
+        return planta_encontrada
 # ========================================================================================================================
 # PROGRAMA PRINCIPAL
 # ========================================================================================================================
