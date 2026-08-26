@@ -249,7 +249,7 @@ def menu_da_conta(dados, utilizador):
 
     while True:
         print("\n===================================")
-        print("        🌻CUIDADO DE PLANTAS🌻      ")
+        print("       🌻 CUIDADO DE PLANTAS 🌻     ")
         print("===================================")
         print(f"Bem-vindo {utilizador['nome']}!")
         print("-----------------------------------")
@@ -272,7 +272,7 @@ def menu_da_conta(dados, utilizador):
             adicionar_planta(dados, utilizador)
 
         elif opcao == "2":
-            print("-")
+            listar_plantas(dados, utilizador)
 
         elif opcao == "3":
             print("-")
@@ -292,6 +292,7 @@ def menu_da_conta(dados, utilizador):
 # ========================================================================================================================
 #  5 - ADICIONAR PLANTAS
 # ========================================================================================================================
+
 def adicionar_planta(dados, utilizador):
 
     print("\n--- ADICIONAR PLANTA 🌱 ---")
@@ -395,6 +396,41 @@ def adicionar_planta(dados, utilizador):
     guardar_dados(dados)
 
     print(f"{nome} adicionada com sucesso!")
+
+# ========================================================================================================================
+#  5 - LISTAR PLANTAS
+# ========================================================================================================================
+
+def listar_plantas(dados, utilizador):
+
+    print("\n--- MINHAS PLANTAS ---")
+
+    minhas_plantas = []
+
+    for planta in dados["plantas"]:
+        if planta["user_id"] == utilizador["id"]:
+            minhas_plantas.append(planta)
+
+    if len(minhas_plantas) == 0: 
+        print("Não tens nenhuma planta registada.")  #Possivel erro: sem plantas registadas
+        return
+
+    for planta in minhas_plantas:
+
+        print("\n-----------------------------------")
+        print(f"ID:                 {planta['id']}")
+        print(f"Nome:               {planta['nome']}")
+        print(f"Tipo:               {planta['tipo']}")
+        print(f"Cuidados:           {planta['cuidados']}")
+        print(f"Última rega:        {planta['ultima_rega']}")
+        print(
+            f"Frequência de rega: "
+            f"{planta['frequencia_rega']} dias"
+        )
+        print(f"Estado:             {planta['estado']}")
+
+    print("-----------------------------------")
+    print(f"Tens un total de {len(minhas_plantas)} plantas")
 
 # ========================================================================================================================
 # PROGRAMA PRINCIPAL
