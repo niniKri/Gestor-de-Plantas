@@ -166,7 +166,7 @@ def criar_conta(dados):
 # ----------- ENTRAR NA CONTA --------------------------------------------------------------------------------------------
 
 def entrar_conta(dados):
-    print("\n--- ENTRAR NA CONTA ---")
+    print("\n----- ENTRAR NA CONTA ------")
 
     if dados["utilizadores"]:
         print("Usernames existentes:")
@@ -178,7 +178,8 @@ def entrar_conta(dados):
     # ----------------------------------------------------
     # USERNAME
     while True:
-        username = input("Selecione o seu username: ").strip()
+        print("-----------------------------------")
+        username = input("\nSelecione o seu username: ").strip()
 
         if username == "":
             print("Erro: o username não pode estar vazio.") # Possivel erro: username estar vazio
@@ -218,8 +219,8 @@ def menu_inicial(dados):
         print("\n====================================")
         print(" 🌻 GESTOR DE CUIDADO DE PLANTAS 🌻 ")
         print("====================================")
-        print("1. Criar conta")
-        print("2. Entrar na conta")
+        print("1. Criar conta") #✔️
+        print("2. Entrar na conta") #✔️
         print("0. Sair")
         print("===================================")
         opcao = input("Por-favor escolha uma opção: ").strip()
@@ -253,13 +254,13 @@ def menu_da_conta(dados, utilizador):
         print("===================================")
         print(f"Bem-vindo {utilizador['nome']}!")
         print("-----------------------------------")
-        print("1. Adicionar planta")
-        print("2. Listar plantas")
-        print("3. Procurar planta")
-        print("4. Atualizar planta")
-        print("5. Remover planta")
-        print("6. Rega Urgente!")
-        print("0. Voltar Atrás")
+        print("1. Adicionar planta") #✔️
+        print("2. Listar plantas") #✔️
+        print("3. Atualizar planta")
+        print("4. Remover planta")
+        print("5. Rega Urgente!")        
+        print("6. Editar o meu Perfil")
+        print("0. Voltar Atrás") #✔️
         print("===================================")
 
         opcao = input("Escolha uma opção: ").strip()
@@ -276,9 +277,8 @@ def menu_da_conta(dados, utilizador):
 
         elif opcao == "3":
             print("-")
-
         elif opcao == "4":
-           print("-")
+            remover_planta(dados, utilizador)
 
         elif opcao == "5":
             print("-")
@@ -411,7 +411,7 @@ def listar_plantas(dados, utilizador):
             minhas_plantas.append(planta)
 
     if len(minhas_plantas) == 0: 
-        print("Não tens nenhuma planta registada.")  #Possivel erro: sem plantas registadas
+        print("Não tens nenhuma planta registada.")  # Possivel erro: sem plantas registadas
         return
 
     for planta in minhas_plantas:
@@ -430,6 +430,80 @@ def listar_plantas(dados, utilizador):
 
     print("-----------------------------------")
     print(f"Tens un total de {len(minhas_plantas)} plantas")
+
+# ========================================================================================================================
+#  7 - REMOVER PLANTA
+# ========================================================================================================================
+
+def remover_planta(dados, utilizador):
+
+    print("\n--- REMOVER PLANTA ---")
+
+    tem_plantas = False     # Verificar se o utilizador tem plantas
+
+    for planta in dados["plantas"]:
+        if planta["user_id"] == utilizador["id"]:
+            tem_plantas = True
+            break
+
+    if not tem_plantas:
+        print("Não tens nenhuma planta registada.")  #Possivel erro: sem plantas registadas
+        return
+
+    # MOSTRAR AS PLANTAS DO UTILIZADOR     -----------------------------------------------------------------------------------------------> transformar en funcion ????
+    print("As tuas plantas:")
+    for planta in dados["plantas"]:
+        if planta["user_id"] == utilizador["id"]:
+            print(f"- {planta['nome']}")
+
+    # PEDIR NOME
+    while True:
+
+        nome_planta =input("Nome da planta que queres remover: ").strip()
+
+        if nome_planta == "":
+            print("Erro: o nome da planta não pode estar vazio.")
+            continue
+
+        planta_encontrada = None
+
+        for planta in dados["plantas"]:
+            if (
+                planta["nome"].lower() == nome_planta.lower() and planta["user_id"] == utilizador["id"]):
+                planta_encontrada = planta
+                break
+
+        if planta_encontrada is None:
+            print(f"Erro: Não foi encontrado nenhuma planta chamada {nome_planta}")
+            continue
+
+        break
+
+    # MOSTRAR PLANTA
+    print("\nPlanta encontrada:")
+    print(f"Nome: {planta_encontrada['nome']}")
+    print(f"Tipo: {planta_encontrada['tipo']}")
+    print(f"Última rega: {planta_encontrada['ultima_rega']}")
+
+    # CONFIRMAR ELIMINACAO
+
+    while True:
+        confirmacao = input("\nTens a certeza que queres remover esta planta? (s/n): ").strip().lower()
+
+        if confirmacao == "s":
+            break
+
+        elif confirmacao == "n":
+            print("Operação cancelada.")
+            return
+
+        else:
+            print("Erro: responde apenas com 's' ou 'n'.")
+
+    # REMOVER
+    dados["plantas"].remove(planta_encontrada)
+    guardar_dados(dados)
+    print(f"\nA planta '{planta_encontrada['nome']} foi removida com sucesso!")
 
 # ========================================================================================================================
 # PROGRAMA PRINCIPAL

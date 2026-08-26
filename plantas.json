@@ -4,19 +4,8 @@
             "id": 1,
             "nome": "ANNY",
             "idade": 12,
-            "username": "anny"
-        },
-        {
-            "id": 2,
-            "nome": "A",
-            "idade": 12,
-            "username": "a"
-        },
-        {
-            "id": 3,
-            "nome": "ANNY",
-            "idade": 12,
-            "username": "as"
+            "username": "anny",
+            "password": "123456789"
         }
     ],
     "plantas": []
