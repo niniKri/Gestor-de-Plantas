@@ -354,7 +354,6 @@ def adicionar_planta(dados, utilizador):
 
     # FREQUÊNCIA DE REGA
     while True:
-
         try:
             frequencia_rega = int(input("Frequência de rega (dias): "))
 
