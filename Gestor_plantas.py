@@ -63,3 +63,83 @@ def guardar_dados(dados):
 
     except OSError:
         print("Erro: não foi possível guardar os dados.")  # Possivel erro : Nao foi possivel guardar os dados
+
+# ========================================================================================================================
+#  3 - FUNÇÃO: Criar ou entrar numa conta
+# ========================================================================================================================
+
+# -----------CRIAR CONTA--------------------------------------------------------------------------------------------------
+def criar_conta(dados):
+    
+    print("\n--- CRIAR CONTA ---")
+
+    # NOME
+    while True:
+        nome = input("Nome: ").strip().upper()
+        if nome == "":
+            print("Erro: o nome não pode estar vazio.") # Possivel erro: nome estar vazio
+            continue
+        if not nome.replace(" ", "").isalpha():
+            print("Erro: o nome não pode conter números ou caracteres especiais.") # Possivel erro: nome invalido
+            continue
+        break
+
+    # IDADE
+    while True:
+        try:
+            idade = int(input("Idade: "))
+        except ValueError:
+            print("Erro: a idade deve ser um número inteiro.") # Possivel erro: nao ser inteiro
+            continue
+        if idade <= 0:
+            print("Erro: a idade deve ser superior a 0.") # Possivel erro: idade ser menor que 0 
+            continue
+        break
+
+    # USERNAME
+    while True:
+        username = input("Username: ").strip()
+
+        if username == "":
+            print("Erro: o username não pode estar vazio.") # Possivel erro: username estar vazio
+            continue
+
+        username_repetido = False
+        for utilizador in dados["utilizadores"]:
+            if utilizador["username"].lower() == username.lower():
+                print("Erro: esse username já está registado.") # Possivel erro: ja existitr um username com ese nome
+                username_repetido = True
+                continue
+
+        if not username_repetido: #se o username nao estiver repetido avanza
+            break
+
+    # GERAR ID
+    if len(dados[utilizadores]) == 0:
+        novo_id = 1
+    else:
+        maior_id=0
+        for utilizador in dados["utilizadores"]:
+            if utilizador["id"] > maior_id:
+                maior_id = utilizador["id"]
+            novo_id = maior_id + 1
+
+    # CRIAR UTILIZADOR
+    utilizador = {
+        "id": novo_id,
+        "nome": nome,
+        "idade": idade,
+        "username": username
+    }
+
+    dados["utilizadores"].append(utilizador)
+
+    guardar_dados(dados)    # chama a funcao e guarda imediatamente no JSON
+
+    print("\nConta criada com sucesso!")
+    print(f"Nome: {nome}")
+    print(f"Username: {username}")
+    print(f"ID de utilizador: {novo_id}")
+
+# ----------- ENTRAR NA CONTA --------------------------------------------------------------------------------------------
+
