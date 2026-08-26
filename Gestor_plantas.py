@@ -19,7 +19,7 @@ def carregar_dados():
             dados = json.load(ficheiro)
 
             if not isinstance(dados, dict):
-                print("Erro: o ficheiro JSON está inválido.") # Possivel erro : Ficheiro JSON invalido
+                print("⚠️ Erro: o ficheiro JSON está inválido.") # Possivel erro : Ficheiro JSON invalido
                 return {"utilizadores": [], "plantas": []}
 
             if "utilizadores" not in dados:
@@ -31,17 +31,17 @@ def carregar_dados():
             return dados
 
     except FileNotFoundError:
-        print("O ficheiro plantas.json ainda não existe.")  # Possivel erro : Ficheiro JSON nao existe
+        print("\n⚠️ O ficheiro plantas.json ainda não existe.")  # Possivel erro : Ficheiro JSON nao existe
         print("Será criado automaticamente.")
         return {"utilizadores": [], "plantas": []}
 
     except json.JSONDecodeError:
-        print("Erro: o ficheiro plantas.json contém dados inválidos.") # Possivel erro : Ficheiro JSON com dados invalidos
+        print("\n⚠️ Erro: o ficheiro plantas.json contém dados inválidos.") # Possivel erro : Ficheiro JSON com dados invalidos
         print("A aplicação vai começar sem dados.")
         return {"utilizadores": [], "plantas": []}
 
     except OSError:
-        print("Erro ao abrir o ficheiro de dados.")  # Possivel erro : Erro ao abrir o Ficheiro JSON 
+        print("\n ⚠️ Erro ao abrir o ficheiro de dados.")  # Possivel erro : Erro ao abrir o Ficheiro JSON 
         return {"utilizadores": [], "plantas": []}
 
 # ========================================================================================================================
@@ -62,7 +62,7 @@ def guardar_dados(dados):
             )
 
     except OSError:
-        print("Erro: não foi possível guardar os dados.")  # Possivel erro : Nao foi possivel guardar os dados
+        print("⚠️ Erro: não foi possível guardar os dados.")  # Possivel erro : Nao foi possivel guardar os dados
 
 # ========================================================================================================================
 #  3 - FUNÇÃO: Criar ou entrar numa conta
@@ -77,10 +77,10 @@ def criar_conta(dados):
     while True:
         nome = input("Nome: ").strip().upper()
         if nome == "":
-            print("Erro: o nome não pode estar vazio.") # Possivel erro: nome estar vazio
+            print("⚠️ Erro: o nome não pode estar vazio.") # Possivel erro: nome estar vazio
             continue
         if not nome.replace(" ", "").isalpha():
-            print("Erro: o nome não pode conter números ou caracteres especiais.") # Possivel erro: nome invalido
+            print("⚠️ Erro: o nome não pode conter números ou caracteres especiais.") # Possivel erro: nome invalido
             continue
         break
 
@@ -89,10 +89,10 @@ def criar_conta(dados):
         try:
             idade = int(input("Idade: "))
         except ValueError:
-            print("Erro: a idade deve ser um número inteiro.") # Possivel erro: nao ser inteiro
+            print("⚠️ Erro: a idade deve ser um número inteiro.") # Possivel erro: nao ser inteiro
             continue
         if idade <= 0:
-            print("Erro: a idade deve ser superior a 0.") # Possivel erro: idade ser menor que 0 
+            print("⚠️ Erro: a idade deve ser superior a 0.") # Possivel erro: idade ser menor que 0 
             continue
         break
 
@@ -101,13 +101,13 @@ def criar_conta(dados):
         username = input("Username: ").strip()
 
         if username == "":
-            print("Erro: o username não pode estar vazio.") # Possivel erro: username estar vazio
+            print("⚠️ Erro: o username não pode estar vazio.") # Possivel erro: username estar vazio
             continue
 
         username_repetido = False
         for utilizador in dados["utilizadores"]:
             if utilizador["username"].lower() == username.lower():
-                print("Erro: esse username já está registado.") # Possivel erro: ja existitr um username com ese nome
+                print("⚠️ Erro: esse username já está registado.") # Possivel erro: ja existitr um username com ese nome
                 username_repetido = True
                 continue
 
@@ -115,7 +115,7 @@ def criar_conta(dados):
             break
 
     # GERAR ID
-    if len(dados[utilizadores]) == 0:
+    if len(dados["utilizadores"]) == 0:
         novo_id = 1
     else:
         maior_id=0
@@ -136,10 +136,58 @@ def criar_conta(dados):
 
     guardar_dados(dados)    # chama a funcao e guarda imediatamente no JSON
 
-    print("\nConta criada com sucesso!")
-    print(f"Nome: {nome}")
-    print(f"Username: {username}")
-    print(f"ID de utilizador: {novo_id}")
+    print(f"\n A Conta do {username} foi criada com sucesso! ✔️")
 
 # ----------- ENTRAR NA CONTA --------------------------------------------------------------------------------------------
 
+def entrar_conta(dados):
+    print("\n--- ENTRAR NA CONTA ---")
+
+    while True:
+        username = input("Username: ").strip()
+        if username == "":
+            print("⚠️ Erro: o username não pode estar vazio.") # Possivel erro: estar vazio o username
+            continue  
+        break
+
+    for utilizador in dados["utilizadores"]:
+        if utilizador["username"].lower() == username.lower():
+            print(f"\nBem-vinda, {utilizador['nome']}!")
+            return utilizador
+
+    print("⚠️ Não existe nenhuma conta registada com esse username.") # Possivel erro: nao existir o username
+    return None
+
+# ========================================================================================================================
+#  4 - FUNÇÃO: MENUS (INICIO E DAS PLANTAS)
+# ========================================================================================================================
+
+# ----------- MENU INICIAL --------------------------------------------------------------------------------------------
+
+def menu_inicial(dados):
+    while True:
+        print("\n====================================")
+        print(" 🌻 GESTOR DE CUIDADO DE PLANTAS 🌻 ")
+        print("====================================")
+        print("1. Criar conta")
+        print("2. Entrar na conta")
+        print("0. Sair")
+        print("===================================")
+        opcao = input("Por-favor escolha uma opção: ").strip()
+
+        if opcao == "0":
+            print("\nObrigado por usar o nosso Gestor de cuidado de plantas!")
+            print("A sair do programa...\n")
+
+            break
+
+        elif opcao == "1":
+            criar_conta(dados)
+
+
+# ========================================================================================================================
+# PROGRAMA PRINCIPAL
+# ========================================================================================================================
+
+dados = carregar_dados()
+menu_inicial(dados)
