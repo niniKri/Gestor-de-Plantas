@@ -109,27 +109,52 @@ def criar_conta(dados):
             if utilizador["username"].lower() == username.lower():
                 print("Erro: esse username já está registado.") # Possivel erro: ja existitr um username com ese nome
                 username_repetido = True
-                continue
+                break #trocado -> tinha continue
 
         if not username_repetido: #se o username nao estiver repetido avanza
             break
 
+    # PASSWORD
+    while True:
+        password = input("Password (Por-favor anotar a password num papel!): ").strip()
+
+        if password == "":
+            print("Erro: a password não pode estar vazia.") # Possivel erro: password vazia
+            continue
+
+        if len(password) < 6:
+            print("Erro: a password deve ter pelo menos 6 caracteres.") # Possivel erro: n tem caracteres
+            continue
+
+        password_confirmacao = input("Confirmar password: ").strip()
+
+        if password != password_confirmacao:
+            print("Erro: as passwords não coincidem.") # Possivel erro: as passes nao coincidem
+            continue
+
+        break
+
     # GERAR ID
+# GERAR ID
     if len(dados["utilizadores"]) == 0:
         novo_id = 1
     else:
-        maior_id=0
+        maior_id = 0
+
         for utilizador in dados["utilizadores"]:
             if utilizador["id"] > maior_id:
                 maior_id = utilizador["id"]
-            novo_id = maior_id + 1
+
+        novo_id = maior_id + 1
 
     # CRIAR UTILIZADOR
     utilizador = {
         "id": novo_id,
         "nome": nome,
         "idade": idade,
-        "username": username
+        "username": username,
+        "password": password
+
     }
 
     dados["utilizadores"].append(utilizador)
@@ -143,19 +168,43 @@ def criar_conta(dados):
 def entrar_conta(dados):
     print("\n--- ENTRAR NA CONTA ---")
 
+    if dados["utilizadores"]:
+        print("Usernames existentes:")
+        for utilizador in dados["utilizadores"]:
+            print(f"- {utilizador['username']}")
+    else:
+        print("Ainda não existem contas registadas.")
+        return None
+    # ----------------------------------------------------
+    # USERNAME
     while True:
-        username = input("Username: ").strip()
+        username = input("Selecione o seu username: ").strip()
+
         if username == "":
-            print("Erro: o username não pode estar vazio.") # Possivel erro: estar vazio o username
-            continue  
+            print("Erro: o username não pode estar vazio.") # Possivel erro: username estar vazio
+            continue
         break
 
+    # PROCURAR UTILIZADOR
     for utilizador in dados["utilizadores"]:
         if utilizador["username"].lower() == username.lower():
-            print(f"\nBem-vinda, {utilizador['nome']}!") ################## MUDAR TEXTO
-            return utilizador
 
-    print("Não existe nenhuma conta registada com esse username.") # Possivel erro: nao existir o username
+            # PASSWORD
+            while True:
+                password = input("Password: ").strip()
+
+                if password == "":
+                    print("Erro: a password não pode estar vazia.") # Possivel erro: password vazio
+                    continue
+
+                if password == utilizador["password"]:
+                    print(f"\nBem-vinda, {utilizador['nome']}!")
+                    return utilizador
+
+                print("Erro: password incorreta.") # Possivel erro: password incorreto
+                continue
+
+    print("\nNão existe nenhuma conta registada com esse username.") # Possivel erro: nao existe esse username
     return None
 
 # ========================================================================================================================
