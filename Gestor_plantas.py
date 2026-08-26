@@ -19,7 +19,7 @@ def carregar_dados():
             dados = json.load(ficheiro)
 
             if not isinstance(dados, dict):
-                print("⚠️ Erro: o ficheiro JSON está inválido.") # Possivel erro : Ficheiro JSON invalido
+                print("Erro: o ficheiro JSON está inválido.") # Possivel erro : Ficheiro JSON invalido
                 return {"utilizadores": [], "plantas": []}
 
             if "utilizadores" not in dados:
@@ -31,17 +31,17 @@ def carregar_dados():
             return dados
 
     except FileNotFoundError:
-        print("\n⚠️ O ficheiro plantas.json ainda não existe.")  # Possivel erro : Ficheiro JSON nao existe
+        print("\n O ficheiro plantas.json ainda não existe.")  # Possivel erro : Ficheiro JSON nao existe
         print("Será criado automaticamente.")
         return {"utilizadores": [], "plantas": []}
 
     except json.JSONDecodeError:
-        print("\n⚠️ Erro: o ficheiro plantas.json contém dados inválidos.") # Possivel erro : Ficheiro JSON com dados invalidos
+        print("\nErro: o ficheiro plantas.json contém dados inválidos.") # Possivel erro : Ficheiro JSON com dados invalidos
         print("A aplicação vai começar sem dados.")
         return {"utilizadores": [], "plantas": []}
 
     except OSError:
-        print("\n ⚠️ Erro ao abrir o ficheiro de dados.")  # Possivel erro : Erro ao abrir o Ficheiro JSON 
+        print("\nErro ao abrir o ficheiro de dados.")  # Possivel erro : Erro ao abrir o Ficheiro JSON 
         return {"utilizadores": [], "plantas": []}
 
 # ========================================================================================================================
@@ -62,7 +62,7 @@ def guardar_dados(dados):
             )
 
     except OSError:
-        print("⚠️ Erro: não foi possível guardar os dados.")  # Possivel erro : Nao foi possivel guardar os dados
+        print("Erro: não foi possível guardar os dados.")  # Possivel erro : Nao foi possivel guardar os dados
 
 # ========================================================================================================================
 #  3 - FUNÇÃO: Criar ou entrar numa conta
@@ -77,10 +77,10 @@ def criar_conta(dados):
     while True:
         nome = input("Nome: ").strip().upper()
         if nome == "":
-            print("⚠️ Erro: o nome não pode estar vazio.") # Possivel erro: nome estar vazio
+            print("Erro: o nome não pode estar vazio.") # Possivel erro: nome estar vazio
             continue
         if not nome.replace(" ", "").isalpha():
-            print("⚠️ Erro: o nome não pode conter números ou caracteres especiais.") # Possivel erro: nome invalido
+            print("Erro: o nome não pode conter números ou caracteres especiais.") # Possivel erro: nome invalido
             continue
         break
 
@@ -89,10 +89,10 @@ def criar_conta(dados):
         try:
             idade = int(input("Idade: "))
         except ValueError:
-            print("⚠️ Erro: a idade deve ser um número inteiro.") # Possivel erro: nao ser inteiro
+            print("Erro: a idade deve ser um número inteiro.") # Possivel erro: nao ser inteiro
             continue
         if idade <= 0:
-            print("⚠️ Erro: a idade deve ser superior a 0.") # Possivel erro: idade ser menor que 0 
+            print("Erro: a idade deve ser superior a 0.") # Possivel erro: idade ser menor que 0 
             continue
         break
 
@@ -101,13 +101,13 @@ def criar_conta(dados):
         username = input("Username: ").strip()
 
         if username == "":
-            print("⚠️ Erro: o username não pode estar vazio.") # Possivel erro: username estar vazio
+            print("Erro: o username não pode estar vazio.") # Possivel erro: username estar vazio
             continue
 
         username_repetido = False
         for utilizador in dados["utilizadores"]:
             if utilizador["username"].lower() == username.lower():
-                print("⚠️ Erro: esse username já está registado.") # Possivel erro: ja existitr um username com ese nome
+                print("Erro: esse username já está registado.") # Possivel erro: ja existitr um username com ese nome
                 username_repetido = True
                 continue
 
@@ -146,7 +146,7 @@ def entrar_conta(dados):
     while True:
         username = input("Username: ").strip()
         if username == "":
-            print("⚠️ Erro: o username não pode estar vazio.") # Possivel erro: estar vazio o username
+            print("Erro: o username não pode estar vazio.") # Possivel erro: estar vazio o username
             continue  
         break
 
@@ -155,7 +155,7 @@ def entrar_conta(dados):
             print(f"\nBem-vinda, {utilizador['nome']}!") ################## MUDAR TEXTO
             return utilizador
 
-    print("⚠️ Não existe nenhuma conta registada com esse username.") # Possivel erro: nao existir o username
+    print("Não existe nenhuma conta registada com esse username.") # Possivel erro: nao existir o username
     return None
 
 # ========================================================================================================================
