@@ -161,7 +161,7 @@ def criar_conta(dados):
 
     guardar_dados(dados)    # chama a funcao e guarda imediatamente no JSON
 
-    print(f"\n A Conta do {username} foi criada com sucesso! ✔️")
+    print(f"{nome} adicionada com sucesso!")
 
 # ----------- ENTRAR NA CONTA --------------------------------------------------------------------------------------------
 
@@ -269,7 +269,7 @@ def menu_da_conta(dados, utilizador):
             return "voltar"
 
         elif opcao == "1":
-            print("-")
+            adicionar_planta(dados, utilizador)
 
         elif opcao == "2":
             print("-")
@@ -288,6 +288,114 @@ def menu_da_conta(dados, utilizador):
 
         else:
             print("Erro: opção inválida.")
+
+# ========================================================================================================================
+#  5 - ADICIONAR PLANTAS
+# ========================================================================================================================
+def adicionar_planta(dados, utilizador):
+
+    print("\n--- ADICIONAR PLANTA 🌱 ---")
+
+    # NOME
+    while True:
+        nome = input("Nome da planta: ").strip()
+
+        if nome == "":
+            print("Erro: o nome não pode estar vazio.") # Possivel erro: estar vazio
+            continue
+
+        nome_repetido = False
+
+        for planta in dados["plantas"]:
+            if (planta["nome"].lower() == nome.lower()and planta["user_id"] == utilizador["id"]):
+                nome_repetido = True
+                break
+
+        if nome_repetido:
+            print("Erro: já tens uma planta com esse nome.") # Possivel erro: se ja for repetido o nome da planta
+            continue
+
+        break
+
+    # TIPO
+    while True:
+        tipo = input("Tipo de planta: ").strip()
+
+        if tipo == "":
+            print("Erro: o tipo não pode estar vazio.") #Possivel erro: estar vazio
+            continue
+
+        break
+
+    # CUIDADOS
+    cuidados = input("Algum cuidado em específico?: ").strip()
+
+    # DATA DA ÚLTIMA REGA
+    while True:
+
+        ultima_rega = input("Data da última rega (AAAA-MM-DD): ").strip()
+
+        if ultima_rega == "":
+            print("Erro: a data não pode estar vazia.") # Possivel erro: estar vazio
+            continue
+
+        try:
+            data = datetime.strptime( ultima_rega, "%Y-%m-%d").date()
+
+            if data > date.today():
+                print("Erro: a data não pode ser futura.") # Possivel erro: data errada
+                continue
+
+            break
+
+        except ValueError:
+            print("Erro: data inválida. " "Utiliza o formato AAAA-MM-DD.") #Possivel erro: Tipo invalido
+
+    # FREQUÊNCIA DE REGA
+    while True:
+
+        try:
+            frequencia_rega = int(input("Frequência de rega (dias): "))
+
+            if frequencia_rega <= 0:
+                print("Erro: a frequência deve ser superior a 0.") # Possivel erro: frequencia inferior a 0 
+                continue
+            break
+
+        except ValueError:
+            print("Erro: a frequência deve ser um número inteiro.") #Possivel erro: nao e numero inteiro
+
+    # GERAR ID DA PLANTA
+    if len(dados["plantas"]) == 0:
+        novo_id = 1
+
+    else:
+        maior_id = 0
+
+        for planta in dados["plantas"]:
+            if planta["id"] > maior_id:
+                maior_id = planta["id"]
+
+        novo_id = maior_id + 1
+
+    # CRIAR PLANTA
+    planta = {
+        "id": novo_id,
+        "user_id": utilizador["id"],
+        "nome": nome,
+        "tipo": tipo,
+        "cuidados": cuidados,
+        "ultima_rega": ultima_rega,
+        "frequencia_rega": frequencia_rega,
+        "estado": "ativo"
+    }
+
+    dados["plantas"].append(planta)
+
+    guardar_dados(dados)
+
+    print(f"{nome} adicionada com sucesso!")
+
 # ========================================================================================================================
 # PROGRAMA PRINCIPAL
 # ========================================================================================================================
