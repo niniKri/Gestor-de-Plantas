@@ -1,0 +1,17 @@
+{
+    "utilizadores": [
+        {
+            "id": 1,
+            "nome": "ANNY",
+            "idade": 12,
+            "username": "anny"
+        },
+        {
+            "id": 2,
+            "nome": "A",
+            "idade": 12,
+            "username": "a"
+        }
+    ],
+    "plantas": []
+}

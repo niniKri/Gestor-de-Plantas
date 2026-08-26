@@ -152,7 +152,7 @@ def entrar_conta(dados):
 
     for utilizador in dados["utilizadores"]:
         if utilizador["username"].lower() == username.lower():
-            print(f"\nBem-vinda, {utilizador['nome']}!")
+            print(f"\nBem-vinda, {utilizador['nome']}!") ################## MUDAR TEXTO
             return utilizador
 
     print("⚠️ Não existe nenhuma conta registada com esse username.") # Possivel erro: nao existir o username
@@ -184,7 +184,61 @@ def menu_inicial(dados):
         elif opcao == "1":
             criar_conta(dados)
 
+        elif opcao == "2":
 
+            utilizador_atual = entrar_conta(dados)
+
+            if utilizador_atual is not None:
+                resultado = menu_da_conta(dados, utilizador_atual)
+
+                if resultado == "voltar":
+                    continue
+
+# ----------- MENU PLANTAS --------------------------------------------------------------------------------------------
+
+def menu_da_conta(dados, utilizador):
+
+    while True:
+        print("\n===================================")
+        print("        🌻CUIDADO DE PLANTAS🌻      ")
+        print("===================================")
+        print(f"Bem-vindo {utilizador['nome']}!")
+        print("-----------------------------------")
+        print("1. Adicionar planta")
+        print("2. Listar plantas")
+        print("3. Procurar planta")
+        print("4. Atualizar planta")
+        print("5. Remover planta")
+        print("6. Rega Urgente!")
+        print("0. Voltar Atrás")
+        print("===================================")
+
+        opcao = input("Escolha uma opção: ").strip()
+
+        if opcao == "0":
+            print("\nA voltar ao menu inicial...")
+            return "voltar"
+
+        elif opcao == "1":
+            print("-")
+
+        elif opcao == "2":
+            print("-")
+
+        elif opcao == "3":
+            print("-")
+
+        elif opcao == "4":
+           print("-")
+
+        elif opcao == "5":
+            print("-")
+
+        elif opcao == "6":
+            print("-")
+
+        else:
+            print("Erro: opção inválida.")
 # ========================================================================================================================
 # PROGRAMA PRINCIPAL
 # ========================================================================================================================
