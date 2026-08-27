@@ -1,0 +1,53 @@
+# Trabalho realizado por Anny Santos
+
+# ============================================================
+#Bibliotecas necessárias
+# ============================================================
+import json
+from datetime import datetime, date, timedelta
+import tkinter as tk
+from tkinter import messagebox
+
+# ============================================================
+# CONFIGURAÇÕES
+# ============================================================
+FICHEIRO = "plantas.json"
+
+COR_FUNDO = "#E8F5E9"
+COR_TITULO = "#222222"
+COR_BOTAO = "#346335"
+COR_BOTAO_HOVER = "#ECB38B"
+COR_TEXTO = "#222222"
+COR_ENTRADA = "#DADADA"
+
+# ============================================================
+# 1 - CARREGAR DADOS
+# ============================================================
+def carregar_dados():
+    try:
+        with open(FICHEIRO, "r", encoding="utf-8") as ficheiro: # 1 - Abre o ficheiro JSON (ler)
+            dados = json.load(ficheiro) 
+
+            if not isinstance(dados, dict): # 2- Verifica se e um dicionario
+                messagebox.showerror("Erro! O ficheiro JSON está inválido.") # messagebox -> mostra o erro
+                return {"utilizadores": [], "plantas": []}
+
+            if not isinstance(dados.get("utilizadores"), list): # 3- Verifica se Utilizadores e uma lista
+                dados["utilizadores"] = []
+
+            if not isinstance(dados.get("plantas"), list): # 4- Verifica se plantas e uma lista
+                dados["plantas"] = []
+
+            return dados
+
+    #Possiveis erros:
+    except FileNotFoundError: #Ficheiro plantas.json nao existe
+        return {"utilizadores": [], "plantas": []}
+
+    except json.JSONDecodeError: #Ficheiro existe, mas o conteudo nao e valido
+        messagebox.showerror("Erro! O ficheiro plantas.json contém dados inválidos.")
+        return {"utilizadores": [], "plantas": []}
+
+    except OSError: # Quando não se consegue aceder ao ficheiro
+        messagebox.showerror("Erro! Não foi possível abrir o ficheiro de dados.")
+        return {"utilizadores": [], "plantas": []}
