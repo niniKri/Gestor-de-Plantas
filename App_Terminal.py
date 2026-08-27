@@ -1,8 +1,5 @@
 # Trabalho realizado por Anny Santos
 
-#Erro qualquer na confirmacao passe en criar conta
-#Mudar nome de Frequência de rega (dias):
-
 import json
 from datetime import datetime, date, timedelta
 
@@ -11,10 +8,6 @@ FICHEIRO = "plantas.json"
 # ========================================================================================================================
 # 1 - FUNÇÃO: CARREGAR DADOS -> Guarda plantas e as contas 
 # ========================================================================================================================
-
-#Esta função serve para carregar os dados guardados no ficheiro JSON. 
-#Primeiro, tenta abrir e ler o ficheiro. 
-#Depois, verifica se os dados estão no formato correto e garante que existem as listas de utilizadores e plantas.
 
 def carregar_dados():
     try:
@@ -50,9 +43,6 @@ def carregar_dados():
 # ========================================================================================================================
 # 2 - FUNÇÃO: GUARDAR DADOS
 # ========================================================================================================================
-
-#Esta função serve para guardar os dados da aplicação no ficheiro JSON. 
-#Recebe os dados através do parâmetro dados, abre o ficheiro em modo de escrita e grava os dados no formato JSON. 
 
 def guardar_dados(dados):
     try:
@@ -137,13 +127,12 @@ def criar_conta(dados):
 
         break
 
-    # GERAR ID
-# GERAR ID
+    # GERAR ID DO UTILIZADOR
     if not dados["utilizadores"]:
         novo_id = 1
     else:
-        novo_id = max([planta["id"] for planta in dados["plantas"]],default=0) + 1
-
+        novo_id = max([utilizador["id"] for utilizador in dados["utilizadores"]], default=0) + 1
+        
     # CRIAR UTILIZADOR
     utilizador = {
         "id": novo_id,
