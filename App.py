@@ -1,7 +1,10 @@
 # Trabalho realizado por Anny Santos
 
+#Erro qualquer na confirmacao passe en criar conta
+#Mudar nome de Frequência de rega (dias):
+
 import json
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 FICHEIRO = "plantas.json"
 
@@ -155,7 +158,7 @@ def criar_conta(dados):
 
     guardar_dados(dados)    # chama a funcao e guarda imediatamente no JSON
 
-    print(f"{nome} adicionada com sucesso!")
+    print(f"\nA conta de {username} adicionada com sucesso!")
 
 # ----------- ENTRAR NA CONTA --------------------------------------------------------------------------------------------
 
@@ -247,13 +250,13 @@ def menu_da_conta(dados, utilizador):
         print("===================================")
         print(f"Bem-vindo {utilizador['nome']}!")
         print("-----------------------------------")
-        print("1. Adicionar planta") #✔️
-        print("2. Listar plantas") #✔️
-        print("3. Atualizar planta")
-        print("4. Remover planta") #✔️
-        print("5. Rega Urgente!")        
-        print("6. Editar o meu Perfil")
-        print("0. Voltar Atrás") #✔️
+        print("1. Adicionar planta")       #✔️
+        print("2. Listar plantas")         #✔️
+        print("3. Atualizar planta")       #✔️
+        print("4. Remover planta")         #✔️
+        print("5. Rega Urgente!")          #✔️      
+        print("6. Editar o meu Perfil")    #✔️
+        print("0. Voltar Atrás")           #✔️
         print("===================================")
 
         opcao = input("Escolha uma opção: ").strip()
@@ -275,10 +278,10 @@ def menu_da_conta(dados, utilizador):
             remover_planta(dados, utilizador)
 
         elif opcao == "5":
-            print("-")
+            rega_urgente(dados, utilizador)
 
         elif opcao == "6":
-            print("-")
+            editar_perfil(dados, utilizador)
 
         else:
             print("Erro: opção inválida.")
@@ -386,6 +389,7 @@ def adicionar_planta(dados, utilizador):
 
     dados["plantas"].append(planta)
 
+    # GUARDAR AS ALTERAÇÕES
     guardar_dados(dados)
 
     print(f"{nome} adicionada com sucesso!")
@@ -573,13 +577,140 @@ def remover_planta(dados, utilizador):
             return
 
         else:
-            print("Erro: responde apenas com 's' ou 'n'.")
+            print("Erro: responde apenas com 's' ou 'n'.") #Possivel erro: so pode responder com s e n
 
     # REMOVER
     dados["plantas"].remove(planta_encontrada)
+
+    # GUARDAR AS ALTERAÇÕES
     guardar_dados(dados)
+
     print(f"\nA planta '{planta_encontrada['nome']}' foi removida com sucesso!")
 
+# ========================================================================================================================
+# 9 -  EDITAR PERFIL
+# ========================================================================================================================
+
+def editar_perfil(dados, utilizador):
+
+    print("\n--- EDITAR O MEU PERFIL ---")
+    print("Deixa vazio se não quiseres alterar o valor.")
+
+    # NOME
+    while True:
+        novo_nome = input(f"Novo nome [{utilizador['nome']}]: ").strip()
+
+        if novo_nome == "":
+            break
+
+        if not novo_nome.replace(" ", "").isalpha():
+            print("Erro: o nome não pode conter números ou caracteres especiais.") #Possivel erro: nao pode ter carateres
+            continue
+
+        utilizador["nome"] = novo_nome
+        break
+
+    # IDADE
+    while True:
+        nova_idade = input(f"Nova idade [{utilizador['idade']}]: ").strip()
+
+        if nova_idade == "":
+            break
+
+        try:
+            nova_idade = int(nova_idade)
+            utilizador["idade"] = nova_idade
+            break
+
+        except ValueError:
+            print("Erro: a idade deve ser um número inteiro.")  # Possivel erro: nao ser numero inteiro
+
+    # USERNAME
+    while True:
+        novo_username = input(f"Novo username [{utilizador['username']}]: ").strip()
+
+        if novo_username == "":
+            break
+
+        username_repetido = False
+
+        for outro_utilizador in dados["utilizadores"]:
+            if (
+                outro_utilizador["id"] != utilizador["id"]
+                and outro_utilizador["username"].lower()
+                == novo_username.lower()
+            ):
+                username_repetido = True
+                break
+
+        if username_repetido:
+            print("Erro: esse username já está registado.")  # Possivel erro: ja exisitr esse username no programa
+            continue
+
+        utilizador["username"] = novo_username
+        break
+
+    # PASSWORD
+    while True:
+        nova_password = input("Nova password (deixa vazio para manter a atual): ").strip()
+
+        if nova_password == "":
+            break
+
+        if len(nova_password) < 6:
+            print("Erro: a password deve ter pelo menos 6 caracteres.")  # Possivel erro: nao ter o limite
+            continue
+
+        utilizador["password"] = nova_password
+        break
+
+    # GUARDAR AS ALTERAÇÕES
+    guardar_dados(dados)
+
+    print("\nPerfil atualizado com sucesso!")
+
+# ========================================================================================================================
+# 10 - REGA URGENTE
+# ========================================================================================================================
+
+def rega_urgente(dados, utilizador):
+
+    print("\n--- 🌧️ REGA DAS PLANTAS ---")
+    encontrou_plantas = False
+
+    for planta in dados["plantas"]:
+        if planta["user_id"] == utilizador["id"]:
+            encontrou_plantas = True
+
+            try:
+                ultima_rega = datetime.strptime(planta["ultima_rega"],"%Y-%m-%d").date()
+                proxima_rega = ultima_rega + timedelta(days=planta["frequencia_rega"])
+                diferenca = (date.today() - proxima_rega).days
+
+                print("\n-----------------------------------")
+                print(f"Nome: {planta['nome']}")
+                print(f"Tipo: {planta['tipo']}")
+                print(f"Última rega: {planta['ultima_rega']}")
+                print(f"Frequência de rega: {planta['frequencia_rega']} dias")
+
+                if diferenca > 0:
+                    print(f"A rega está atrasada há {diferenca} dias!🥀")
+
+                elif diferenca == 0:
+                    print("A planta precisa de ser regada hoje!")
+
+                else:
+                    dias_faltam = abs(diferenca)
+                    print(f"Faltam {dias_faltam} dias para a próxima rega.")
+
+            except (ValueError, KeyError, TypeError):
+
+                print(f"Erro nos dados da {planta['nome']} ") # Possivel erro: dados da planta
+
+    if not encontrou_plantas:
+        print("\nNão tens nenhuma planta registada.") # Possivel erro: planta nao encontrada
+    else:
+        print("\n-----------------------------------")
 # =======================================================================================================================
 #  1- fUNCION COMPLEMENTAR - Mostrar plantas
 # ========================================================================================================================
@@ -600,7 +731,7 @@ def procurar_planta(dados, utilizador):
         nome_planta = input("Nome da planta: ").strip()
 
         if nome_planta == "":
-            print("Erro: o nome da planta não pode estar vazio.")
+            print("Erro: o nome da planta não pode estar vazio.") #Possivel erro: nao pode estar vazio
             continue
 
         planta_encontrada = None
@@ -614,7 +745,7 @@ def procurar_planta(dados, utilizador):
                 break
 
         if planta_encontrada is None:
-            print(f"Erro: Não foi encontrada nenhuma planta chamada {nome_planta}.")
+            print(f"Erro: Não foi encontrada nenhuma planta chamada {nome_planta}.") #Possivel erro: nso foi encontrado planta com esse nome
             continue
 
         print("\nPlanta encontrada:")
