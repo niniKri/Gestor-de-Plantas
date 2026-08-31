@@ -321,17 +321,6 @@ def janela_criar_conta(dados):
         password = entrada_password.get()
         confirmacao = entrada_confirmacao.get()
 
-        #.......GERAR ID
-        novo_id = obter_novo_id_utilizador(dados) # Chama a funcao
-
-        #.......CRIAR UTILIZADOR
-        utilizador = {
-            "id": novo_id,
-            "nome": nome,
-            "username": username,
-            "password": password
-        }
-
         #Possiveis erros:
 
         #.......NOME
@@ -361,6 +350,17 @@ def janela_criar_conta(dados):
         if password != confirmacao:
             messagebox.showerror("Erro","As passwords não coincidem.",parent=janela)
             return
+
+        #.......GERAR ID
+        novo_id = obter_novo_id_utilizador(dados) # Chama a funcao
+
+        #.......CRIAR UTILIZADOR
+        utilizador = {
+            "id": novo_id,
+            "nome": nome,
+            "username": username,
+            "password": password
+        }
 
         #.......Depois de validar os erros - guarda no JSON
         dados["utilizadores"].append(utilizador)
@@ -1153,7 +1153,7 @@ def janela_rega_urgente(dados, utilizador):
         except (ValueError, KeyError, TypeError):
             tk.Label(frame_conteudo,text="Erro nos dados desta planta.",bg=COR_PREENCHER,fg=COR_TITULO,font=("Inter", 10, "bold")
             ).pack(side="left",padx=(0, 20))       
-            
+
 # =======================================================================================================================
 # PROGRAMA PRINCIPAL
 # =======================================================================================================================

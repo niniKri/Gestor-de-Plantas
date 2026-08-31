@@ -1,0 +1,57 @@
+{
+    "utilizadores": [
+        {
+            "id": 1,
+            "nome": "cuentaUnoCambiada",
+            "username": "santos_cambiada_1",
+            "password": "santos"
+        },
+        {
+            "id": 2,
+            "nome": "santosDos",
+            "username": "santosDos",
+            "password": "santos"
+        },
+        {
+            "id": 3,
+            "nome": "santosTres",
+            "username": "santosTres",
+            "password": "santos"
+        }
+    ],
+    "plantas": [
+        {
+            "id": 1,
+            "user_id": 1,
+            "nome": "plantaUno",
+            "tipo": "-",
+            "cuidados": "-",
+            "ultima_rega": "2026-08-22",
+            "frequencia_rega": 20,
+            "estado": "ativo",
+            "foto": "C:/Users/AnnyK/Desktop/cosas/GestordePlantas_anny/img.png"
+        },
+        {
+            "id": 2,
+            "user_id": 2,
+            "nome": "plantaUno",
+            "tipo": "-",
+            "cuidados": "-",
+            "ultima_rega": "2026-08-22",
+            "frequencia_rega": 20,
+            "estado": "ativo",
+            "foto": "C:/Users/AnnyK/Desktop/cosas/GestordePlantas_anny/img.png"
+        },
+        {
+            "id": 3,
+            "user_id": 2,
+            "nome": "plantaUnod",
+            "tipo": "2026-08-22",
+            "cuidados": "-",
+            "ultima_rega": "2026-08-22",
+            "frequencia_rega": 20,
+            "estado": "ativo",
+            "foto": "C:/Users/AnnyK/Desktop/cosas/GestordePlantas_anny/img.png"
+        }
+    ]
+}
