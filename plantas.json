@@ -52,6 +52,17 @@
             "frequencia_rega": 20,
             "estado": "ativo",
             "foto": "C:/Users/AnnyK/Desktop/cosas/GestordePlantas_anny/img.png"
+        },
+        {
+            "id": 4,
+            "user_id": 1,
+            "nome": "santos_cambiada_1",
+            "tipo": "santos_cambiada_1",
+            "cuidados": "santos_cambiada_1",
+            "ultima_rega": "2002-08-22",
+            "frequencia_rega": 22,
+            "estado": "ativo",
+            "foto": null
         }
     ]
 }

@@ -131,7 +131,7 @@ def procurar_planta_por_id(dados, utilizador, planta_id):
             return planta
     return None
 
-
+#....... cada planta com id diferente : adicionar planta
 def obter_novo_id_plantas(dados):
     if not dados["plantas"]:
         return 1
@@ -144,7 +144,7 @@ def obter_novo_id_plantas(dados):
             pass
     return maior_id + 1
 
-
+#....... cada utilizador com id diferente : criar conta
 def obter_novo_id_utilizador(dados):
     if not dados["utilizadores"]:
         return 1
@@ -157,32 +157,18 @@ def obter_novo_id_utilizador(dados):
             pass
     return maior_id + 1
 
+#....... cria zona para fazer scroll em : listas e rega urgente
 def criar_area_scroll(janela):
-
     frame_principal = tk.Frame(janela, bg=COR_FUNDO)
     frame_principal.pack(fill="both", expand=True, padx=15, pady=10)
 
     canvas = tk.Canvas(frame_principal, bg=COR_FUNDO, highlightthickness=0)
-    scrollbar = tk.Scrollbar(
-        frame_principal,
-        orient="vertical",
-        command=canvas.yview
-    )
+    scrollbar = tk.Scrollbar(frame_principal,orient="vertical",command=canvas.yview)
 
     frame_resultados = tk.Frame(canvas, bg=COR_FUNDO)
+    frame_resultados.bind( "<Configure>", lambda evento: canvas.configure(scrollregion=canvas.bbox("all")))
 
-    frame_resultados.bind(
-        "<Configure>",
-        lambda evento: canvas.configure(
-            scrollregion=canvas.bbox("all")
-        )
-    )
-
-    janela_canvas = canvas.create_window(
-        (0, 0),
-        window=frame_resultados,
-        anchor="nw"
-    )
+    janela_canvas = canvas.create_window((0, 0),window=frame_resultados,anchor="nw")
 
     def ajustar_largura(evento):
         canvas.itemconfig(janela_canvas, width=evento.width)
@@ -194,6 +180,24 @@ def criar_area_scroll(janela):
     scrollbar.pack(side="right", fill="y")
 
     return frame_resultados
+
+#....... Funcao auxiliar para mudar a cor do botao no menu 
+def existem_plantas_para_regar(dados, utilizador):
+    minhas_plantas = obter_minhas_plantas(dados, utilizador)
+
+    for planta in minhas_plantas:
+        try:
+            ultima_rega = datetime.strptime(planta["ultima_rega"], "%Y-%m-%d").date()
+            frequencia = int(planta["frequencia_rega"])
+            proxima_rega = ultima_rega + timedelta(days=frequencia)
+            # Se hoje já chegou ou passou da data da próxima rega
+            if date.today() >= proxima_rega:
+                return True
+
+        except (ValueError, KeyError, TypeError):
+            pass
+
+    return False
 
 # =======================================================================================================================
 # 1 - CARREGAR DADOS
@@ -216,7 +220,7 @@ def carregar_dados():
 
             return dados
 
-    #Possiveis erros:
+    #.......Possiveis erros:
     except FileNotFoundError: #Ficheiro plantas.json nao existe
         return {"utilizadores": [], "plantas": []}
 
@@ -238,7 +242,7 @@ def guardar_dados(dados):
             json.dump( dados, ficheiro, indent=4,ensure_ascii=False) #transforma os dados do python e transforma em JSON
         return True
     
-    #Possiveis erros:
+    #.......Possiveis erros:
     except OSError:
         messagebox.showerror("Erro","Não foi possível guardar os dados.")
         return False
@@ -282,7 +286,6 @@ def menu_inicial(dados):
 # =======================================================================================================================
 
 def janela_criar_conta(dados):
-
     #----- 1 parte Janela
     janela = tk.Toplevel()
     janela.title("Criar conta")
@@ -315,7 +318,6 @@ def janela_criar_conta(dados):
 
     #----- Criar utilizador na JSON 
     def criar():
-
         nome = entrada_nome.get().strip()
         username = entrada_username.get().strip()
         password = entrada_password.get()
@@ -384,8 +386,8 @@ def janela_criar_conta(dados):
 # 5 - ENTRAR NA CONTA
 # =======================================================================================================================
 
-#----- 1 parte Janela
 def janela_entrar_conta(dados):
+    #----- 1 parte Janela
     janela = tk.Toplevel()
     janela.title("Entrar na conta")
     janela.geometry("500x400")
@@ -476,7 +478,11 @@ def janela_conta(dados, utilizador):
     botao.pack(pady=7)
 
     #....... REGA URGENTE
-    botao = criar_botao(janela,"Rega urgente",lambda: janela_rega_urgente(dados, utilizador),30)
+    if existem_plantas_para_regar(dados, utilizador):
+        botao = criar_botao_base(janela,"Rega urgente",lambda: janela_rega_urgente(dados, utilizador),COR_BOTAO_SAIDA,COR_BOTAO_SAIDA_HOVER,30 )
+    else:
+        botao = criar_botao(janela,"Rega urgente",lambda: janela_rega_urgente(dados, utilizador),30)
+
     botao.pack(pady=7)
 
     #....... EDITAR PERFIL
@@ -1153,6 +1159,13 @@ def janela_rega_urgente(dados, utilizador):
         except (ValueError, KeyError, TypeError):
             tk.Label(frame_conteudo,text="Erro nos dados desta planta.",bg=COR_PREENCHER,fg=COR_TITULO,font=("Inter", 10, "bold")
             ).pack(side="left",padx=(0, 20))       
+            
+    #----- 4 Botones:
+    frame_botoes = tk.Frame(janela, bg=COR_FUNDO)
+    frame_botoes.pack(side="bottom")
+
+    botao_fechar = criar_botao_saida(janela, "Cancelar",janela.destroy, 15)
+    botao_fechar.pack(pady=10)
 
 # =======================================================================================================================
 # PROGRAMA PRINCIPAL
