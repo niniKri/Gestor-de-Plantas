@@ -137,7 +137,7 @@ def remover_planta():
 
 **Extensões a realizar apenas depois de o MVP estar funcional:**
 
--Permitir ordenar as plantas por nome ou por frequência de rega.
+-Permitir ordenar as plantas por nome.
 -Apresentar uma lista separada das plantas que precisam de ser regadas com urgência.
 
 ## 7. Divisão inicial de tarefas

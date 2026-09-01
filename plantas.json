@@ -2,64 +2,41 @@
     "utilizadores": [
         {
             "id": 1,
-            "nome": "cuentaUnoCambiada",
-            "username": "santos_cambiada_1",
-            "password": "santos"
-        },
-        {
-            "id": 2,
-            "nome": "santosDos",
-            "username": "santosDos",
-            "password": "santos"
-        },
-        {
-            "id": 3,
-            "nome": "santosTres",
-            "username": "santosTres",
-            "password": "santos"
+            "nome": "Anny",
+            "username": "Santos",
+            "password": "acf098b06f1a3aa05be8ced9a8f52af2674a891155079799075ef945cd6d2199"
         }
     ],
     "plantas": [
         {
             "id": 1,
             "user_id": 1,
-            "nome": "plantaUno",
-            "tipo": "-",
-            "cuidados": "-",
-            "ultima_rega": "2026-08-22",
+            "nome": "Plantini viva",
+            "tipo": "nose",
+            "cuidados": "nose",
+            "ultima_rega": "2026-09-01",
             "frequencia_rega": 20,
             "estado": "ativo",
             "foto": "C:/Users/AnnyK/Desktop/cosas/GestordePlantas_anny/img.png"
         },
         {
             "id": 2,
-            "user_id": 2,
-            "nome": "plantaUno",
-            "tipo": "-",
-            "cuidados": "-",
-            "ultima_rega": "2026-08-22",
-            "frequencia_rega": 20,
+            "user_id": 1,
+            "nome": "plantini muerta",
+            "tipo": "nose",
+            "cuidados": "nose",
+            "ultima_rega": "2002-02-22",
+            "frequencia_rega": 12,
             "estado": "ativo",
-            "foto": "C:/Users/AnnyK/Desktop/cosas/GestordePlantas_anny/img.png"
+            "foto": null
         },
         {
             "id": 3,
-            "user_id": 2,
-            "nome": "plantaUnod",
-            "tipo": "2026-08-22",
-            "cuidados": "-",
-            "ultima_rega": "2026-08-22",
-            "frequencia_rega": 20,
-            "estado": "ativo",
-            "foto": "C:/Users/AnnyK/Desktop/cosas/GestordePlantas_anny/img.png"
-        },
-        {
-            "id": 4,
             "user_id": 1,
-            "nome": "santos_cambiada_1",
-            "tipo": "santos_cambiada_1",
-            "cuidados": "santos_cambiada_1",
-            "ultima_rega": "2002-08-22",
+            "nome": "112",
+            "tipo": "sadas",
+            "cuidados": "sadasd",
+            "ultima_rega": "2002-02-02",
             "frequencia_rega": 22,
             "estado": "ativo",
             "foto": null

@@ -31,7 +31,7 @@ import tkinter as tk                             #Nota: envez de escrever tkinte
 import os
 import shutil
 from tkinter import filedialog
-
+import hashlib
 # =======================================================================================================================
 # CONFIGURAÇÕES
 # =======================================================================================================================
@@ -199,6 +199,10 @@ def existem_plantas_para_regar(dados, utilizador):
 
     return False
 
+#.......Funcao para encriptar la password
+def criar_hash_password(password):
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
 # =======================================================================================================================
 # 1 - CARREGAR DADOS
 # =======================================================================================================================
@@ -361,7 +365,7 @@ def janela_criar_conta(dados):
             "id": novo_id,
             "nome": nome,
             "username": username,
-            "password": password
+            "password":criar_hash_password(password)
         }
 
         #.......Depois de validar os erros - guarda no JSON
@@ -424,7 +428,7 @@ def janela_entrar_conta(dados):
         
         for utilizador in dados["utilizadores"]:
             if utilizador.get("username", "").lower() == username.lower():
-                if password == utilizador.get("password", ""):
+                if criar_hash_password(password) == utilizador.get("password", ""):
                     janela.destroy()
                     janela_conta(dados,utilizador)
                     return
@@ -480,7 +484,7 @@ def janela_conta(dados, utilizador):
 
     #....... REGA URGENTE
     if existem_plantas_para_regar(dados, utilizador):
-        botao = criar_botao_base(janela,"Rega urgente",lambda: janela_rega_urgente(dados, utilizador),COR_BOTAO_SAIDA,COR_BOTAO_SAIDA_HOVER,30 )
+        botao = criar_botao_base(janela,"Rega urgente",lambda: janela_rega_urgente(dados, utilizador),COR_BOTAO_SAIDA_HOVER,COR_BOTAO_HOVER,30 )
     else:
         botao = criar_botao(janela,"Rega urgente",lambda: janela_rega_urgente(dados, utilizador),30)
 
@@ -651,81 +655,98 @@ def janela_listar_plantas(dados, utilizador):
     #.......Se nao tem plantas
     if not minhas_plantas:
         tk.Label(janela, text="Não tens nenhuma planta registada.", font=("Inter", 13), bg=COR_FUNDO, fg=COR_TEXTO).pack(pady=50)
-
         botao_fechar = criar_botao_saida(janela, "Fechar", janela.destroy, 15)
         botao_fechar.pack(pady=10)
         return
-    
-    #.......chama funcao auxiliar para a area com scroll
+
+    #----- Botões de ordenação
+    frame_ordenacao = tk.Frame(janela, bg=COR_FUNDO)
+    frame_ordenacao.pack(pady=(0, 10))
+
+    tk.Label(frame_ordenacao, text="Ordenar por:", font=("Inter", 11, "bold"), bg=COR_FUNDO, fg=COR_TEXTO).pack(side="left", padx=5)
+
+    #----- Área com scroll
     frame_plantas = criar_area_scroll(janela)
 
-    #....... Para cada planta das mihas criar a tabelita
-    for planta in minhas_plantas:
-        frame = tk.Frame(frame_plantas, bg=COR_PREENCHER, padx=15, pady=10)
-        frame.pack(fill="x", padx=5, pady=8)
+    def mostrar_plantas(lista_plantas):
+        for widget in frame_plantas.winfo_children():
+            widget.destroy()
 
-        tk.Label(frame, text=planta.get("nome", "Sem nome"), font=("Inter", 13, "bold"), bg=COR_PREENCHER, fg=COR_TITULO, anchor="w").pack(fill="x", pady=(0, 10))
+        for planta in lista_plantas:
+            frame = tk.Frame(frame_plantas, bg=COR_PREENCHER, padx=15, pady=10)
+            frame.pack(fill="x", padx=5, pady=8)
 
-        frame_conteudo = tk.Frame(frame, bg=COR_PREENCHER)
-        frame_conteudo.pack(fill="x")
+            tk.Label(frame, text=planta.get("nome", "Sem nome"), font=("Inter", 13, "bold"), bg=COR_PREENCHER, fg=COR_TITULO, anchor="w").pack(fill="x", pady=(0, 10))
 
-        caminho_foto = planta.get("foto")
+            frame_conteudo = tk.Frame(frame, bg=COR_PREENCHER)
+            frame_conteudo.pack(fill="x")
 
-        #.......Verifica se existe a foto
-        if caminho_foto and os.path.exists(caminho_foto):
-            try:
-                imagem = tk.PhotoImage(file=caminho_foto)
-                largura = imagem.width()
-                altura = imagem.height()
-                if largura > 180 or altura > 180:
-                    fator = max(largura // 180, altura // 180)
-                    if fator < 1:
-                        fator = 1
-                    imagem = imagem.subsample(fator, fator)
+            caminho_foto = planta.get("foto")
 
-                label_imagem = tk.Label(frame_conteudo, image=imagem, bg=COR_PREENCHER)
-                label_imagem.image = imagem
-                label_imagem.pack(side="left", padx=(0, 20))
+            if caminho_foto and os.path.exists(caminho_foto):
+                try:
+                    imagem = tk.PhotoImage(file=caminho_foto)
+                    largura = imagem.width()
+                    altura = imagem.height()
 
-            except tk.TclError:
-                tk.Label(frame_conteudo, text="Imagem inválida", bg=COR_PREENCHER, fg=COR_TITULO).pack(side="left", padx=(0, 20))
+                    if largura > 180 or altura > 180:
+                        fator = max(largura // 180, altura // 180)
+                        if fator < 1:
+                            fator = 1
+                        imagem = imagem.subsample(fator, fator)
 
-        else:
-            tk.Label(frame_conteudo, text="Sem foto", width=15, height=7, bg=COR_PREENCHER, fg=COR_TITULO).pack(side="left", padx=(0, 20))
+                    label_imagem = tk.Label(frame_conteudo, image=imagem, bg=COR_PREENCHER)
+                    label_imagem.image = imagem
+                    label_imagem.pack(side="left", padx=(0, 20))
 
-        #....... texto nas tabelas
-        texto_widget = tk.Text(frame_conteudo,bg=COR_PREENCHER,fg=COR_TEXTO,font=("Inter", 10), wrap="word", height=5,width=45, bd=0, highlightthickness=0  )
-        texto_widget.pack(side="left", fill="both", expand=True)
+                except tk.TclError:
+                    tk.Label(frame_conteudo, text="Imagem inválida", bg=COR_PREENCHER, fg=COR_TITULO).pack(side="left", padx=(0, 20))
 
-        #....... Definir estilo bold
-        texto_widget.tag_configure("bold", font=("Inter", 10, "bold"))
+            else:
+                tk.Label(frame_conteudo, text="Sem foto", width=15, height=7, bg=COR_PREENCHER, fg=COR_TITULO).pack(side="left", padx=(0, 20))
 
-        ##.......Tipo
-        texto_widget.insert("end", "Tipo:", "bold")
-        texto_widget.insert("end", f" {planta.get('tipo', '')}\n")
+            texto_widget = tk.Text(frame_conteudo, bg=COR_PREENCHER, fg=COR_TEXTO, font=("Inter", 10), wrap="word", height=5, width=45, bd=0, highlightthickness=0)
+            texto_widget.pack(side="left", fill="both", expand=True)
 
-        #.......Cuidados
-        texto_widget.insert("end", "Cuidados:", "bold")
-        texto_widget.insert("end", f" {planta.get('cuidados', '')}\n")
+            texto_widget.tag_configure("bold", font=("Inter", 10, "bold"))
 
-        #.......Última rega
-        texto_widget.insert("end", "Última rega:", "bold")
-        texto_widget.insert("end", f" {planta.get('ultima_rega', '')}\n")
+            texto_widget.insert("end", "Tipo:", "bold")
+            texto_widget.insert("end", f" {planta.get('tipo', '')}\n")
 
-        #....... Frequência de rega
-        texto_widget.insert("end", "Frequência de rega:", "bold")
-        texto_widget.insert("end", f" {planta.get('frequencia_rega', '')} dias\n")
+            texto_widget.insert("end", "Cuidados:", "bold")
+            texto_widget.insert("end", f" {planta.get('cuidados', '')}\n")
 
-        # Impedir edição
-        texto_widget.config(state="disabled")
+            texto_widget.insert("end", "Última rega:", "bold")
+            texto_widget.insert("end", f" {planta.get('ultima_rega', '')}\n")
 
-    #----- 4 Botones:
+            texto_widget.insert("end", "Frequência de rega:", "bold")
+            texto_widget.insert("end", f" {planta.get('frequencia_rega', '')} dias\n")
+
+            texto_widget.config(state="disabled")
+
+    def ordenar_nome():
+        plantas_ordenadas = sorted(minhas_plantas, key=lambda planta: planta.get("nome", "").lower())
+        mostrar_plantas(plantas_ordenadas)
+
+    def ordenar_frequencia():
+        plantas_ordenadas = sorted(minhas_plantas, key=lambda planta: int(planta.get("frequencia_rega", 0)))
+        mostrar_plantas(plantas_ordenadas)
+
+    botao_nome = criar_botao(janela, "Nome", ordenar_nome, 10)
+    botao_nome.pack(in_=frame_ordenacao, side="left", padx=5)
+
+    botao_frequencia = criar_botao(janela, "Frequência", ordenar_frequencia, 10)
+    botao_frequencia.pack(in_=frame_ordenacao, side="left", padx=5)
+
+    mostrar_plantas(minhas_plantas)
+
+    #----- Botão Fechar
     frame_botoes = tk.Frame(janela, bg=COR_FUNDO)
     frame_botoes.pack(side="bottom")
 
     botao_fechar = criar_botao_saida(janela, "Fechar", janela.destroy, 20)
     botao_fechar.pack(pady=10)
-
+    
 # =======================================================================================================================
 # 9 - ATUALIZAR PLANTA
 # =======================================================================================================================
@@ -791,8 +812,9 @@ def janela_atualizar_planta(dados, utilizador):
 
         planta=None
         for p in minhas_plantas:
-            if p["nome"]==nome_escolhido: planta=p
-            break
+            if p["nome"]==nome_escolhido: 
+                planta=p
+                break
         if planta is None: 
             return
         
@@ -1053,119 +1075,129 @@ def janela_editar_perfil(dados, utilizador, label_bem_vindo=None):
 # =======================================================================================================================
 
 def janela_rega_urgente(dados, utilizador):
-    #----- 1 parte Janela
+    # ----- 1 parte Janela
     janela = tk.Toplevel()
     janela.title("Rega urgente")
     janela.geometry("650x600")
     janela.resizable(False, False)
     janela.configure(bg=COR_FUNDO)
 
-    #----- 2 parte titulo Principal:
-    tk.Label(janela, text="REGA DAS PLANTAS", font=("Inter", 18, "bold"), bg=COR_FUNDO).pack(pady=15)
+    # ----- 2 parte titulo Principal:
+    tk.Label(janela,text="REGA DAS PLANTAS",font=("Inter", 18, "bold"),bg=COR_FUNDO).pack(pady=15)
 
-    #.......Obter as plantas do utilizador
+    # .......Obter as plantas do utilizador
     minhas_plantas = obter_minhas_plantas(dados, utilizador)
 
-    #.......Se nao tem plantas
+    # .......Se nao tem plantas
     if not minhas_plantas:
-        tk.Label(janela, text="Não tens nenhuma planta registada.", font=("Inter", 13), bg=COR_FUNDO, fg=COR_TEXTO).pack(pady=50)
+        tk.Label(janela,text="Não tens nenhuma planta registada.",font=("Inter", 13),bg=COR_FUNDO,fg=COR_TEXTO).pack(pady=50)
 
-        botao_fechar = criar_botao_saida(janela, "Fechar", janela.destroy, 15)
+        botao_fechar = criar_botao_saida(janela,"Fechar",janela.destroy,15)
         botao_fechar.pack(pady=10)
         return
 
-    #.......chama funcao auxiliar para a area com scroll
+    # .......chama funcao auxiliar para a area com scroll
     frame_resultados = criar_area_scroll(janela)
 
-    #....... calcula a rega
+    # .......contador de plantas que precisam de ser regadas
+    plantas_urgentes = 0
+
+    # .......calcula a rega
     for planta in minhas_plantas:
-
-        frame = tk.Frame(frame_resultados,bg=COR_PREENCHER,padx=15, pady=10)
-        frame.pack(fill="x", padx=5, pady=8)
-
-        tk.Label(frame,text=planta.get("nome", "Sem nome"), font=("Inter", 13, "bold"),bg=COR_PREENCHER, fg=COR_TITULO, anchor="w").pack(fill="x", pady=(0, 10))
-
-        frame_conteudo = tk.Frame(frame,bg=COR_PREENCHER)
-        frame_conteudo.pack(fill="x")
-
-        caminho_foto = planta.get("foto")
-
-        if caminho_foto and os.path.exists(caminho_foto):
-
-            try:
-                imagem = tk.PhotoImage(file=caminho_foto)
-
-                largura = imagem.width()
-                altura = imagem.height()
-
-                if largura > 180 or altura > 180:
-                    fator = max(largura // 180, altura // 180)
-
-                    if fator < 1:
-                        fator = 1
-
-                    imagem = imagem.subsample(fator, fator)
-
-                label_imagem = tk.Label(frame_conteudo,image=imagem,bg=COR_PREENCHER)
-                label_imagem.image = imagem
-                label_imagem.pack(side="left", padx=(0, 20))
-
-            except tk.TclError:
-
-                tk.Label(frame_conteudo,text="Imagem inválida",bg=COR_PREENCHER,fg=COR_TITULO).pack(side="left", padx=(0, 20))
-
-        else:
-            tk.Label(frame_conteudo,text="Sem foto",width=15,height=7,bg=COR_PREENCHER,fg=COR_TITULO).pack(side="left", padx=(0, 20))
 
         try:
             ultima_rega = datetime.strptime(planta["ultima_rega"],"%Y-%m-%d").date()
             frequencia = int(planta["frequencia_rega"])
             proxima_rega = ultima_rega + timedelta(days=frequencia)
+
             diferenca = (date.today() - proxima_rega).days
 
-            #.......Informação da planta
-            info = tk.Text(
-                frame_conteudo,
-                bg=COR_PREENCHER,
-                fg=COR_TEXTO,
-                font=("Inter", 10),
-                wrap="word",
-                height=2,
-                width=35,
-                bd=0,
-                highlightthickness=0
-            )
+            # Se ainda nao precisa de ser regada
+            if diferenca < 0:
+                continue
+
+            plantas_urgentes += 1
+
+            # ----- Frame da planta
+            frame = tk.Frame(frame_resultados,bg=COR_PREENCHER,padx=15,pady=10)
+            frame.pack(fill="x",padx=5,pady=8)
+
+            # .......Nome da planta
+            tk.Label(frame,text=planta.get("nome", "Sem nome"),font=("Inter", 13, "bold"),bg=COR_PREENCHER,fg=COR_TITULO,anchor="w" ).pack(fill="x",pady=(0, 10))
+
+            frame_conteudo = tk.Frame(frame,bg=COR_PREENCHER)
+            frame_conteudo.pack(fill="x")
+
+            # .......Foto
+            caminho_foto = planta.get("foto")
+
+            if caminho_foto and os.path.exists(caminho_foto):
+
+                try:
+                    imagem = tk.PhotoImage(file=caminho_foto)
+                    largura = imagem.width()
+                    altura = imagem.height()
+
+                    if largura > 180 or altura > 180:
+                        fator = max(
+                            largura // 180,
+                            altura // 180
+                        )
+
+                        if fator < 1:
+                            fator = 1
+
+                        imagem = imagem.subsample(fator,fator)
+
+                    label_imagem = tk.Label(frame_conteudo,image=imagem,bg=COR_PREENCHER)
+                    label_imagem.image = imagem
+                    label_imagem.pack(side="left",padx=(0, 20))
+
+                except tk.TclError:
+                    tk.Label(frame_conteudo,text="Imagem inválida",bg=COR_PREENCHER,fg=COR_TITULO).pack(side="left",padx=(0, 20))
+
+            else:
+                tk.Label(frame_conteudo,text="Sem foto", width=15, height=7,bg=COR_PREENCHER,fg=COR_TITULO).pack(side="left",padx=(0, 20))
+
+            # .......Informação da planta
+            info = tk.Text(frame_conteudo,bg=COR_PREENCHER,fg=COR_TEXTO,font=("Inter", 10),wrap="word",height=2,width=35,bd=0,highlightthickness=0)
             info.pack(side="left",fill="both",expand=True)
-            #.......Estilo a negrito
+
+            # .......Estilo a negrito
             info.tag_configure("bold",font=("Inter", 10, "bold"))
 
-            #.......Tipo
+            # .......Tipo
             info.insert("end","Tipo:","bold")
+
             info.insert("end",f" {planta.get('tipo', '')}\n")
 
-            #.......Mensage do Estado da rega
+            # .......Mensagem do estado da rega
             if diferenca > 0:
                 mensagem = (f"A rega está atrasada há "f"{diferenca} dias!")
-            elif diferenca == 0:
-                mensagem = "Precisa de ser regada hoje!"
             else:
-                mensagem = (f"Faltam {abs(diferenca)} dias " f"para a próxima rega.")
+                mensagem = "Precisa de ser regada hoje!"
 
-            info.insert("end","Estado:","bold")
+            info.insert( "end","Estado:","bold")
             info.insert("end",f" {mensagem}")
 
-            #.......Impedir edição
-            info.config(state="disabled")
+            # .......Impedir edição
+            info.config( state="disabled")
 
         except (ValueError, KeyError, TypeError):
-            tk.Label(frame_conteudo,text="Erro nos dados desta planta.",bg=COR_PREENCHER,fg=COR_TITULO,font=("Inter", 10, "bold")
-            ).pack(side="left",padx=(0, 20))       
-            
-    #----- 4 Botones:
-    frame_botoes = tk.Frame(janela, bg=COR_FUNDO)
+
+            tk.Label(frame_resultados,text="Erro nos dados desta planta.",bg=COR_PREENCHER,fg=COR_TITULO,font=("Inter", 10, "bold")
+            ).pack(padx=5,pady=8)
+
+    # .......Nenhuma planta precisa de ser regada
+    if plantas_urgentes == 0:
+        tk.Label(frame_resultados,text="Não há plantas que precisem de ser regadas.",font=("Inter", 13, "bold"),bg=COR_FUNDO,fg=COR_TEXTO
+        ).pack(pady=50)
+
+    # ----- 4 Botones
+    frame_botoes = tk.Frame(janela,bg=COR_FUNDO)
     frame_botoes.pack(side="bottom")
 
-    botao_fechar = criar_botao_saida(janela, "Cancelar",janela.destroy, 15)
+    botao_fechar = criar_botao_saida(janela,"Cancelar",janela.destroy,15)
     botao_fechar.pack(pady=10)
 
 # =======================================================================================================================
