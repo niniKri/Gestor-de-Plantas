@@ -387,7 +387,7 @@ def janela_criar_conta(dados):
 # =======================================================================================================================
 
 def janela_entrar_conta(dados):
-    #----- 1 parte Janela
+    #----- 1 parte Janela   
     janela = tk.Toplevel()
     janela.title("Entrar na conta")
     janela.geometry("500x400")
