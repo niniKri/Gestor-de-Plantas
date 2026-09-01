@@ -412,6 +412,16 @@ def janela_entrar_conta(dados):
         username = entrada_username.get().strip()
         password = entrada_password.get()
 
+        #.......Possiveis erros:
+        #....... se o utilizador nao coloca nada e o primeiro erro que aparece
+        if username == "":
+            messagebox.showerror("Erro","O username não pode estar vazio.",parent=janela)
+            return
+
+        if password == "":
+            messagebox.showerror("Erro","A password não pode estar vazia.",parent=janela)
+            return
+        
         for utilizador in dados["utilizadores"]:
             if utilizador.get("username", "").lower() == username.lower():
                 if password == utilizador.get("password", ""):
@@ -422,15 +432,6 @@ def janela_entrar_conta(dados):
                     messagebox.showerror("Erro","Password incorreta.",parent=janela)
                     return
         messagebox.showerror("Erro","Não existe nenhuma conta registada com esse username.",parent=janela)
-
-        #.......Possiveis erros:
-        if username == "":
-            messagebox.showerror("Erro","O username não pode estar vazio.",parent=janela)
-            return
-
-        if password == "":
-            messagebox.showerror("Erro","A password não pode estar vazia.",parent=janela)
-            return
         
     #----- 4 Botones:
     frame_botoes = tk.Frame(janela, bg=COR_FUNDO)
