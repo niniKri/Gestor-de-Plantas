@@ -5,19 +5,19 @@
 # - Bibliotecas:                    linha 24
 # - Configurações:                  linha 37
 # - Funções auxiliares:             linha 53
-# - Carregar dados:                 linha 
-# - Guardar dados:                  linha 
-# - Menu inicial:                   linha 
-# - Criar conta:                    linha 
-# - Entrar na conta:                linha 
-# - Menu do utilizador:             linha 
-# - Adicionar planta:               linha 
-# - Listar plantas:                 linha 
-# - Atualizar planta:               linha 
-# - Remover planta:                 linha 
-# - Editar perfil:                  linha 
-# - Rega urgente:                   linha 
-# - Programa principal:             linha 
+# - Carregar dados:                 linha 203
+# - Guardar dados:                  linha 236
+# - Menu inicial:                   linha 251
+# - Criar conta:                    linha 285
+# - Entrar na conta:                linha 386
+# - Menu do utilizador:             linha 446
+# - Adicionar planta:               linha 497
+# - Listar plantas:                 linha 633
+# - Atualizar planta:               linha 729
+# - Remover planta:                 linha 896
+# - Editar perfil:                  linha 965
+# - Rega urgente:                   linha 1051
+# - Programa principal:             linha 1171
 # ============================================================
 
 # =======================================================================================================================
