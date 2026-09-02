@@ -1,7 +1,7 @@
 # Trabalho realizado por Anny Santos
 
 # ============================================================
-# Indice:# 
+# Indice: (pode nao ter as linhas exatas ao codigo devido a alteracoes feitas)
 # - Bibliotecas:                    linha 24
 # - Configurações:                  linha 37
 # - Funções auxiliares:             linha 53
@@ -25,13 +25,14 @@
 # =======================================================================================================================
 
 import json
-from datetime import datetime, date, timedelta
-from tkinter import messagebox
 import tkinter as tk                             #Nota: envez de escrever tkinter.Tk() escrevo tk.Tk() 
 import os
-import shutil
-from tkinter import filedialog
 import hashlib
+import shutil
+from datetime import datetime, date, timedelta
+from tkinter import messagebox
+from tkinter import filedialog
+
 # =======================================================================================================================
 # CONFIGURAÇÕES
 # =======================================================================================================================
@@ -100,10 +101,14 @@ def criar_botao_saida(janela, texto, comando, largura=30):
         largura
     )
 
-#-----Imagen fundo:
+#.......Funcao para encriptar la password
+def criar_hash_password(password):
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+#-----Imagen fundo -> usado en menu inicial
 def colocar_fundo(janela):
     try:
-        imagem_fundo = tk.PhotoImage(file="img.png")
+        imagem_fundo = tk.PhotoImage(file="fotos/img.png")
         imagem_fundo = imagem_fundo.subsample(2, 2) #Reduz a img a metade
         fundo = tk.Label(janela,image=imagem_fundo)
         fundo.place(x=0,y=0,relwidth=1,relheight=1)
@@ -115,14 +120,50 @@ def colocar_fundo(janela):
         print("Aviso: não foi possível carregar a imagem de fundo.")
         janela.configure(bg=COR_FUNDO)
         return None
+    
+#....... Monstrar mensagem quando nao existem plantas (listar,atualizar,eliminar, rega urgente)
+def mostrar_sem_plantas(janela):
+    tk.Label(
+        janela,
+        text="Não tens nenhuma planta registada.",
+        font=("Inter", 13),
+        bg=COR_FUNDO,
+        fg=COR_TEXTO
+    ).pack(pady=50)
 
-#-----Encontrar plantas de dado utilizador
+    botao_fechar = criar_botao_saida(
+        janela,
+        "Fechar",
+        janela.destroy,
+        15
+    )
+    botao_fechar.pack(side="bottom", pady=10)
+
+#.......Encontrar plantas de dado utilizador
 def obter_minhas_plantas(dados, utilizador):
     minhas_plantas = []
     for planta in dados["plantas"]:
         if planta.get("user_id") == utilizador["id"]:
             minhas_plantas.append(planta)
     return minhas_plantas
+
+#....... Funcao auxiliar para mudar a cor do botao no menu 
+def existem_plantas_para_regar(dados, utilizador):
+    minhas_plantas = obter_minhas_plantas(dados, utilizador)
+
+    for planta in minhas_plantas:
+        try:
+            ultima_rega = datetime.strptime(planta["ultima_rega"], "%Y-%m-%d").date()
+            frequencia = int(planta["frequencia_rega"])
+            proxima_rega = ultima_rega + timedelta(days=frequencia)
+            # Se hoje já chegou ou passou da data da próxima rega
+            if date.today() >= proxima_rega:
+                return True
+
+        except (ValueError, KeyError, TypeError):
+            pass
+
+    return False
 
 #----- Busca plantas por id 
 def procurar_planta_por_id(dados, utilizador, planta_id):
@@ -180,28 +221,6 @@ def criar_area_scroll(janela):
     scrollbar.pack(side="right", fill="y")
 
     return frame_resultados
-
-#....... Funcao auxiliar para mudar a cor do botao no menu 
-def existem_plantas_para_regar(dados, utilizador):
-    minhas_plantas = obter_minhas_plantas(dados, utilizador)
-
-    for planta in minhas_plantas:
-        try:
-            ultima_rega = datetime.strptime(planta["ultima_rega"], "%Y-%m-%d").date()
-            frequencia = int(planta["frequencia_rega"])
-            proxima_rega = ultima_rega + timedelta(days=frequencia)
-            # Se hoje já chegou ou passou da data da próxima rega
-            if date.today() >= proxima_rega:
-                return True
-
-        except (ValueError, KeyError, TypeError):
-            pass
-
-    return False
-
-#.......Funcao para encriptar la password
-def criar_hash_password(password):
-    return hashlib.sha256(password.encode("utf-8")).hexdigest()
 
 # =======================================================================================================================
 # 1 - CARREGAR DADOS
@@ -494,9 +513,6 @@ def janela_conta(dados, utilizador):
     botao = criar_botao(janela,"Editar o meu perfil",lambda: janela_editar_perfil(dados, utilizador, label_bem_vindo),30)
     botao.pack(pady=7)
 
-    #----- 4 Botones:
-    botao = criar_botao_saida(janela,"Fechar",janela.destroy,30)
-    botao.pack(pady=15)
 
 # =======================================================================================================================
 # 7 - ADICIONAR PLANTA
@@ -547,9 +563,17 @@ def janela_adicionar_planta(dados, utilizador):
 
     def escolher_foto():
         nonlocal foto_planta
+
         caminho = filedialog.askopenfilename(
             title="Escolher foto da planta",
-            filetypes=[("Imagens", "*.png *.jpg *.jpeg"),("PNG", "*.png"),("JPG", "*.jpg"),("JPEG", "*.jpeg")])
+            filetypes=[
+                ("Imagens", "*.png *.jpg *.jpeg"),
+                ("PNG", "*.png"),
+                ("JPG", "*.jpg"),
+                ("JPEG", "*.jpeg")
+            ]
+        )
+
         if caminho:
             foto_planta = caminho
             label_foto.config(text=os.path.basename(caminho))
@@ -607,17 +631,29 @@ def janela_adicionar_planta(dados, utilizador):
             return
 
         #....... CRIAR PLANTA
+        novo_id = obter_novo_id_plantas(dados)
+        caminho_foto = None
+
+        if foto_planta:
+            os.makedirs("fotos", exist_ok=True)
+            extensao = os.path.splitext(foto_planta)[1]
+            nome_foto = f"planta_{novo_id}{extensao}"
+            caminho_destino = os.path.join("fotos", nome_foto)
+            shutil.copy2(foto_planta, caminho_destino)
+            caminho_foto = caminho_destino.replace("\\", "/")
+
         nova_planta = {
-            "id": obter_novo_id_plantas(dados),
+            "id": novo_id,
             "user_id": utilizador["id"],
             "nome": nome,
             "tipo": tipo,
             "cuidados": cuidados,
             "ultima_rega": ultima_rega,
             "frequencia_rega": frequencia_rega,
-            "estado": "ativo",
-            "foto": foto_planta
+            "foto": caminho_foto
         }
+
+        #....... guardar dados da planta
         dados["plantas"].append(nova_planta)
 
         if guardar_dados(dados):
@@ -654,9 +690,7 @@ def janela_listar_plantas(dados, utilizador):
     
     #.......Se nao tem plantas
     if not minhas_plantas:
-        tk.Label(janela, text="Não tens nenhuma planta registada.", font=("Inter", 13), bg=COR_FUNDO, fg=COR_TEXTO).pack(pady=50)
-        botao_fechar = criar_botao_saida(janela, "Fechar", janela.destroy, 15)
-        botao_fechar.pack(pady=10)
+        mostrar_sem_plantas(janela)
         return
 
     #----- Botões de ordenação
@@ -766,9 +800,8 @@ def janela_atualizar_planta(dados, utilizador):
     minhas_plantas=obter_minhas_plantas(dados,utilizador)
 
     #.......Se não tiver plantas
-    if not minhas_plantas: 
-        messagebox.showinfo("Aviso","Não tens nenhuma planta registada.",parent=janela) 
-        janela.destroy() 
+    if not minhas_plantas:
+        mostrar_sem_plantas(janela)
         return
 
     #.......Escolher planta
@@ -930,10 +963,12 @@ def janela_remover_planta(dados, utilizador):
     #----- 2 parte titulo Principal:
     tk.Label(janela, text="REMOVER PLANTA", font=("Inter", 18, "bold"), bg=COR_FUNDO).pack(pady=25)
 
+    #....... Obter as plantas do utilizador
+    minhas_plantas=obter_minhas_plantas(dados,utilizador)
+
     #-----Se não tiver plantas
-    minhas_plantas = obter_minhas_plantas(dados, utilizador)
     if not minhas_plantas:
-        messagebox.showinfo("Aviso", "Não tens nenhuma planta registada.")
+        mostrar_sem_plantas(janela)
         return
     
     #-----Escolher planta
@@ -1045,7 +1080,7 @@ def janela_editar_perfil(dados, utilizador, label_bem_vindo=None):
             if len(nova_password) < 6:
                 messagebox.showerror("Erro","A password deve ter pelo menos 6 caracteres.", parent=janela)
                 return
-            utilizador["password"] = nova_password
+            utilizador["password"] = criar_hash_password(nova_password)
 
         #....... atualizar no JSON
         utilizador["nome"] = novo_nome
@@ -1090,12 +1125,8 @@ def janela_rega_urgente(dados, utilizador):
 
     # .......Se nao tem plantas
     if not minhas_plantas:
-        tk.Label(janela,text="Não tens nenhuma planta registada.",font=("Inter", 13),bg=COR_FUNDO,fg=COR_TEXTO).pack(pady=50)
-
-        botao_fechar = criar_botao_saida(janela,"Fechar",janela.destroy,15)
-        botao_fechar.pack(pady=10)
+        mostrar_sem_plantas(janela)
         return
-
     # .......chama funcao auxiliar para a area com scroll
     frame_resultados = criar_area_scroll(janela)
 

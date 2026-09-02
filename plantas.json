@@ -11,35 +11,12 @@
         {
             "id": 1,
             "user_id": 1,
-            "nome": "Plantini viva",
-            "tipo": "nose",
-            "cuidados": "nose",
-            "ultima_rega": "2026-09-01",
+            "nome": "a",
+            "tipo": "A",
+            "cuidados": "A",
+            "ultima_rega": "2026-09-02",
             "frequencia_rega": 20,
-            "estado": "ativo",
-            "foto": "C:/Users/AnnyK/Desktop/cosas/GestordePlantas_anny/img.png"
-        },
-        {
-            "id": 2,
-            "user_id": 1,
-            "nome": "plantini muerta",
-            "tipo": "nose",
-            "cuidados": "nose",
-            "ultima_rega": "2002-02-22",
-            "frequencia_rega": 12,
-            "estado": "ativo",
-            "foto": null
-        },
-        {
-            "id": 3,
-            "user_id": 1,
-            "nome": "112",
-            "tipo": "sadas",
-            "cuidados": "sadasd",
-            "ultima_rega": "2002-02-02",
-            "frequencia_rega": 22,
-            "estado": "ativo",
-            "foto": null
+            "foto": "fotos/planta_1.png"
         }
     ]
 }

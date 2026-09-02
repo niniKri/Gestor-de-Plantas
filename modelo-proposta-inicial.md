@@ -79,7 +79,7 @@ registo = {
     "tipo": "Flor",
     "ultima_rega": "2026-08-20", 
     "frequencia_rega": 7, 
-    "estado": "ativo" }
+     }
 ```
 
 **Como serão guardados vários registos?**
