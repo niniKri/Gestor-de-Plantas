@@ -603,7 +603,7 @@ def janela_adicionar_planta(dados, utilizador):
         #.......ERRROS POSSIVEIS:
         #.......TIPO
         if tipo == "":
-            messagebox.showerror("Erro! O tipo da planta não pode estar vazio.",parent=janela)
+            messagebox.showerror("Erro","O tipo da planta não pode estar vazio.",parent=janela)
             return
 
         #....... DATA

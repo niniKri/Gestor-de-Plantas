@@ -11,12 +11,22 @@
         {
             "id": 1,
             "user_id": 1,
-            "nome": "a",
+            "nome": "z",
             "tipo": "A",
             "cuidados": "A",
             "ultima_rega": "2026-09-02",
             "frequencia_rega": 20,
             "foto": "fotos/planta_1.png"
+        },
+        {
+            "id": 2,
+            "user_id": 1,
+            "nome": "b",
+            "tipo": "b",
+            "cuidados": "b",
+            "ultima_rega": "2005-02-22",
+            "frequencia_rega": 12,
+            "foto": null
         }
     ]
 }
